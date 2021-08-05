@@ -98,6 +98,8 @@ class UBLMeshEditPlugin(octoprint.plugin.AssetPlugin,
 				# No Active Mesh Slot Selected. Need to do something about it...
 				#Just default to 0 for now
 			    self.no_mesh_slot = True
+			else:
+				self.no_mesh_slot = False
 		elif 'Active Mesh Slot:' in line.strip():
 			self.slot_num =int(line.split(':')[(len(line.split(':')) - 1)])
 			self._logger.info('Active Mesh Slot: ' + self.slot_num)
