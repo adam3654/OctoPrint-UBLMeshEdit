@@ -104,6 +104,8 @@ class UBLMeshEditPlugin(octoprint.plugin.AssetPlugin,
 			if (self.slot_num == -1):
 				self.no_mesh_slot = True
 				self._logger.info('No Mesh Set Active!')
+			else:
+				self.no_mesh_slot = False				
 		elif 'EEPROM can hold' in line.strip():
 			self.max_slots = int(line.split(' ')[len(line.split(' '))-2])
 		elif self.in_topo:
