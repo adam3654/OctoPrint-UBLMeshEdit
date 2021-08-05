@@ -10,10 +10,10 @@ In its current state, this plugin is intended to be used to make minor tweaks to
 
 ## Setup
 
-Install via the bundled [Plugin Manager](https://docs.octoprint.org/en/master/bundledplugins/pluginmanager.html)
-or manually using this URL:
+<!--- Install via the bundled [Plugin Manager](https://docs.octoprint.org/en/master/bundledplugins/pluginmanager.html) --->
+Currently, this fork of the plugin can only be installed manually using this URL:
 
-    https://github.com/The-EG/OctoPrint-UBLMeshEdit/archive/main.zip
+    https://github.com/adam3654/OctoPrint-UBLMeshEdit/archive/main.zip
 
 ## Usage
 
