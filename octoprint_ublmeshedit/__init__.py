@@ -25,6 +25,8 @@ class UBLMeshEditPlugin(octoprint.plugin.AssetPlugin,
 		self.skip_first = False
 		self.skip_line = False
 		self.not_ubl = False
+		self.no_mesh_slot = False
+		self.max_slots = 0
 
 	##~~ SettingsPlugin mixin
 	def get_settings_defaults(self):
@@ -92,6 +94,18 @@ class UBLMeshEditPlugin(octoprint.plugin.AssetPlugin,
 			self.send_mesh_collected_event()
 		elif 'Storage slot:' in line.strip():
 			self.slot_num = int(line.strip()[13:])
+			if (self.slot_num == -1):
+				# No Active Mesh Slot Selected. Need to do something about it...
+				#Just default to 0 for now
+			    self.slot_num = 0 
+		elif 'Active Mesh Slot:' in line.strip():
+			self.slot_num =int(line.split(':')[(len(line.split(':')) - 1)])
+			self._logger.info('Active Mesh Slot: ' + self.slot_num)
+			if (self.slot_num == -1):
+				self.no_mesh_slot = True
+				self._logger.info('No Mesh Set Active!')
+		elif 'EEPROM can hold' in line.strip():
+			self.max_slots = int(line.split(' ')[len(line.split(' '))-2])
 		elif self.in_topo:
 			if self.skip_line:
 				self.skip_line = False
@@ -115,8 +129,10 @@ class UBLMeshEditPlugin(octoprint.plugin.AssetPlugin,
 		event = octoprint.events.Events.PLUGIN_UBLMESHEDIT_MESH_READY
 		if self.mesh_data is None:
 			data = {'result': 'no mesh'}
+		elif self.no_mesh_slot:
+			data = {'result': 'no mesh'}
 		else:
-			data = {'result': 'ok', 'data': self.mesh_data, 'gridSize': len(self.mesh_data), 'saveSlot': self.slot_num}
+			data = {'result': 'ok', 'data': self.mesh_data, 'gridSize': len(self.mesh_data), 'saveSlot': self.slot_num, 'maxSlots': self.max_slots}
 		if self.not_ubl: data['notUBL'] = True
 		self._event_bus.fire(event, payload=data)
 

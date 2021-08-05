@@ -16,6 +16,7 @@ $(function() {
         self.pointCol = ko.observable(undefined);
         self.pointRow = ko.observable(undefined);
         self.gridSize = undefined;
+        self.maxSlots = undefined;
         self.gridData = ko.observable(undefined);
         self.saveSlot = ko.observable(undefined);
         self.waitingOK = ko.observable(false);
@@ -69,7 +70,7 @@ $(function() {
         }
 
         self.onEventplugin_ublmeshedit_command_complete = function() {
-            self.waitingOK(false);
+            self.waitingOK(false);            
             self.getMesh();
         }
 
@@ -100,6 +101,7 @@ $(function() {
 
             self.gridSize = payload.gridSize;
             self.gridData(payload.data);
+            self.maxSlots = payload.maxSlots;
 
             self.saveSlot(payload.saveSlot);
 
@@ -190,6 +192,10 @@ $(function() {
             }
         }
 
+        self.initialize = function() {
+            OctoPrint.control.sendGcode("M503");
+        }
+
         self.getMesh = function() {
             OctoPrint.control.sendGcode("M420 V1 T1");
         }
@@ -256,12 +262,14 @@ $(function() {
 
         self.exportMesh = function() {
             var gcode = "";
+	    var mesh_save_slot = (self.saveSlot() != -1) ? self.saveSlot() : 0
             gcode += "; Mesh exported from UBL Mesh Editor plugin\n";
             gcode += `; Grid Size = ${self.gridSize}\n`;
-            gcode += `; Save Slot = ${self.saveSlot()}\n`;
-
+            gcode += `; Save Slot = ${mesh_save_slot}\n`;
+	        gcode += `G29 L${mesh_save_slot}\n`;
+	        gcode += "G29 A\n";6
             for(var row = 0; row < self.gridSize; row++) {
-                for(var col =0; col < self.gridSize; col++) {
+                for(var col = 0; col < self.gridSize; col++) {
                     var i = col;
                     var j = self.gridSize - 1 - row;
                     if (self.notUBL()) {
@@ -271,6 +279,7 @@ $(function() {
                 }
             }
 
+	        gcode += `G29 S${mesh_save_slot}\n`;
             gcode += 'M420 V1 T1\n';
 
             $('#ublMeshEditExportAnchor').attr({
